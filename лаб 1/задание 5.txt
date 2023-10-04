@@ -1,0 +1,23 @@
+from datetime import datetime, timedelta
+
+# День рождения
+my_birthday = datetime(2020, 4, 20)
+
+# Начальная и конечная даты
+start_date = datetime(my_birthday.year + 1, 1, 1)
+end_date = datetime(2023, 1, 1)
+
+# Инициализация счетчика
+counter = 0
+
+# Перебор всех дат в заданном диапазоне
+current_date = start_date
+while current_date < end_date:
+    # Проверка, встретились ли часовая и минутная стрелки
+    if current_date.hour == current_date.minute:
+        counter += 1
+
+    # Переход к следующей минуте
+    current_date += timedelta(minutes=1)
+
+print(f"Часовая и минутная стрелки встретились {counter} раз.")

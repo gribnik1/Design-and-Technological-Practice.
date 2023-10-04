@@ -1,0 +1,20 @@
+def calculate_months_to_triple_deposit(S, i):
+    balance = S  # Изначальный баланс вклада
+    target_balance = 3 * S  # Целевой баланс вклада
+    rate = i / 100  # Годовая процентная ставка
+
+    months = 0  # Счетчик месяцев
+
+    while balance < target_balance:
+        interest = balance * rate / 12  # Расчет процентов за текущий месяц
+        balance += interest  # Прибавление процентов к балансу
+        months += 1  # Увеличение счетчика месяцев
+
+    return months
+
+# Пример использования
+initial_deposit = 5000  # Изначальный вклад в тысячах рублей
+interest_rate = 5  # Годовая процентная ставка
+
+months_to_triple = calculate_months_to_triple_deposit(initial_deposit, interest_rate)
+print(f"Банковский вклад утроится через {months_to_triple} месяцев.")

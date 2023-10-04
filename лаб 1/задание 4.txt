@@ -1,0 +1,31 @@
+# Стоимость продуктов
+costs = {
+    'пицца': 85,
+    'хлеб': 35,
+    'дошик': 13,
+    'молоко': 65,
+    'ботончик': 55,
+    'шавуха': 170
+}
+
+# Ввод количества денег у студента
+student_money = int(input("Введите количество денег у студента (в рублях): "))
+
+# Покупка продуктов и расчет остатка денег
+for product1, price1 in costs.items():
+    if price1 <= student_money:
+        print(f"\nМожно купить {product1} за {price1} рублей.")
+        money_left1 = student_money - price1
+
+        for product2, price2 in costs.items():
+            if price2 <= money_left1:
+                print(f"- {product2} за {price2} рублей.")
+                money_left2 = money_left1 - price2
+
+                for product3, price3 in costs.items():
+                    if price3 <= money_left2:
+                        print(f"-- {product3} за {price3} рублей.")
+                        money_left3 = money_left2 - price3
+
+                        print(f"Останется {money_left3} рублей.")
+
