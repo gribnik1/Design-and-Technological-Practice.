@@ -1,43 +1,38 @@
-import requests
+import pandas as pd
+import re
+import plotly.graph_objects as go
 
-# Получаем данные о погоде в текущей локации пользователя
-url = "https://api.openweathermap.org/data/2.5/weather"
-params = {
-    "lat": "55.7522",  # Широта Москвы
-    "lon": "37.6156",  # Долгота Москвы
-    "appid": "09b69d775c5f23dfd7beac6754b6a205",  # OpenWeatherMap
-    "units": "metric"  # Единицы измерения: градусы Цельсия
-}
-response = requests.get(url, params=params)
-data = response.json()
+df = pd.read_csv("doubles3.csv")
 
-# Анализируем данные о погоде
-if data.get("main"):
-    temperature = data["main"]["temp"]
-    humidity = data["main"]["humidity"]
-else:
-    temperature = "неизвестно"
-    humidity = "неизвестно"
+def parse_score(score):
+    scores = re.findall("\d{1,2}-\d{1,2}", score)
+    
+    total = 0
 
-if data.get("wind"):
-    wind_speed = data["wind"]["speed"]
-else:
-    wind_speed = "неизвестно"
+    for score in scores:
+        splitted = score.split("-")
+        total += int(splitted[0]) + int(splitted[1])
 
-# Определяем тип погоды с наибольшей вероятностью
-if temperature == "неизвестно":
-    print("Не удалось получить данные о температуре")
-elif temperature < 10:
-    print("Скорее всего, вы находитесь внутри помещения (холодно)")
-elif humidity > 70:
-    print("Скорее всего, вы находитесь внутри помещения (высокая влажность)")
-elif wind_speed == "неизвестно":
-    print("Не удалось получить данные о скорости ветра")
-elif wind_speed > 5:
-    print("Скорее всего, вы находитесь на улице (ветрено)")
-else:
-    print("Скорее всего, вы находитесь на улице (хорошая погода)")
+    return total
 
-print("Температура: ", temperature)
-print("Влажность: ", humidity)
-print("Скорость ветра: ", wind_speed)
+df["score_total"] = df["score"].apply(lambda x: parse_score(x))
+
+scores = df["score_total"]
+scores = scores[scores > 0].value_counts()
+
+scores = scores[scores > 0]
+
+fig = go.Figure(data=[go.Bar(x = scores.index.to_list(), y = scores.to_list())])
+fig.write_html("tennis_scores.html")
+
+
+df["team1"] = df["winner1_name"] + "/" + df["winner2_name"]
+df["team2"] = df["loser1_name"] + "/" +df["loser2_name"]
+
+scores = pd.DataFrame(df[["team1", "score_total"]])
+scores.columns = ["team2",  "score_total"]
+
+scores_all = scores.merge(df["team2"])
+scores_all = scores_all.groupby("team2").sum()
+
+print(scores_all.nlargest(10, 'score_total'))
